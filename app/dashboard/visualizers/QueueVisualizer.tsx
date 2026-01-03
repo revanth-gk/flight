@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, LogOut, Users } from 'lucide-react';
+import { UserPlus, LogOut, Users, Key, MonitorPlay } from 'lucide-react';
 import { BoardingQueue, type Passenger } from '@/lib/dataStructures';
 import { generateId, getRandomName, generateEmail, generatePhone } from '@/lib/utils';
 
@@ -45,8 +45,8 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
             phone: generatePhone(),
         };
 
-        queue.enqueue(passenger);
-        const newPassengers = queue.toArray();
+        const newPassengers = [...passengers, passenger];
+        queue.enqueue(passenger); // Sync logical state
         setOperation(`Enqueue O(1): Added ${passenger.name} to queue`);
         setPassengers(newPassengers);
         setAnimatingIndex(newPassengers.length - 1);
@@ -54,19 +54,20 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
     };
 
     const dequeuePassenger = () => {
-        const removed = queue.dequeue();
-        if (removed) {
-            setOperation(`Dequeue O(1): ${removed.name} boarded the flight`);
-            setAnimatingIndex(0);
-            setTimeout(() => {
-                setPassengers(queue.toArray());
-                setAnimatingIndex(null);
-            }, 500);
-        }
+        if (passengers.length === 0) return;
+        const removed = passengers[0];
+        setOperation(`Dequeue O(1): ${removed.name} boarded the flight`);
+        setAnimatingIndex(0);
+
+        setTimeout(() => {
+            queue.dequeue(); // Sync logical state
+            setPassengers(prev => prev.slice(1));
+            setAnimatingIndex(null);
+        }, 500);
     };
 
     const viewFront = () => {
-        const front = queue.front();
+        const front = passengers[0];
         if (front) {
             setOperation(`Front O(1): Next to board is ${front.name}`);
             setAnimatingIndex(0);
@@ -76,135 +77,165 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 glass-card p-6">
-                <div className="flex items-center justify-between mb-6">
+            <div className="lg:col-span-2 panel relative overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between mb-8 z-10 relative">
                     <div>
-                        <h2 className="text-2xl font-bold mb-1">Queue - Boarding Queue</h2>
+                        <h2 className="text-2xl font-bold mb-1 text-shadow-sm flex items-center gap-2">
+                            <Users className="w-6 h-6 text-orange-500" />
+                            Queue - Boarding Line
+                        </h2>
                         <p className="text-secondary text-sm">FIFO structure for fair passenger boarding</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(249, 115, 22, 0.5)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={enqueuePassenger}
-                            className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-700 rounded-lg font-semibold text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <UserPlus className="w-4 h-4" />
                             Enqueue
                         </motion.button>
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={dequeuePassenger}
-                            className="px-4 py-2 bg-white bg-opacity-10 rounded-lg font-semibold text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             Dequeue
                         </motion.button>
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={viewFront}
-                            className="px-4 py-2 bg-white bg-opacity-10 rounded-lg font-semibold text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
-                            <Users className="w-4 h-4" />
+                            <MonitorPlay className="w-4 h-4" />
                             Front
                         </motion.button>
                     </div>
                 </div>
 
                 {/* Queue Visualization */}
-                <div className="relative">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="text-xs font-mono bg-red-500 bg-opacity-20 px-3 py-1 rounded">
-                            FRONT (Exit)
+                <div className="flex-1 relative min-h-[350px] bg-black/20 rounded-2xl border border-white/5 p-6 overflow-hidden flex flex-col">
+                    <div className="absolute inset-0 grid-pattern opacity-30" />
+
+                    <div className="flex items-center gap-4 mb-8 z-10 w-full">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_#ef4444]" />
+                            <span className="text-xs font-bold text-red-500 tracking-widest uppercase">Front (Exit)</span>
                         </div>
-                        <div className="flex-1 h-px bg-gradient-to-r from-red-500 to-transparent"></div>
-                        <div className="text-xs font-mono bg-red-500 bg-opacity-20 px-3 py-1 rounded">
-                            REAR (Entry)
+                        <div className="flex-1 h-px bg-gradient-to-r from-red-500 via-orange-500 to-transparent opacity-50 relative">
+                            <motion.div
+                                animate={{ x: [-100, 100] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                                className="absolute top-0 bottom-0 w-20 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-sm"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-orange-500 tracking-widest uppercase">Rear (Entry)</span>
+                            <div className="w-3 h-3 bg-orange-500 rounded-full shadow-[0_0_10px_#f97316]" />
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto pb-4">
+                    <div className="overflow-x-auto pb-4 no-scrollbar flex-1 flex items-center z-10">
                         {passengers.length === 0 ? (
-                            <div className="text-center py-12 text-secondary">
-                                <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                                <p>Queue is empty. Enqueue passengers to begin.</p>
+                            <div className="w-full text-center text-secondary flex flex-col items-center justify-center">
+                                <div className="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                                    <Users className="w-10 h-10 text-orange-500 opacity-60" />
+                                </div>
+                                <p className="text-lg font-medium">Queue is empty</p>
+                                <p className="text-sm opacity-60">Enqueue passengers to start boarding</p>
                             </div>
                         ) : (
-                            <div className="flex items-stretch gap-3">
+                            <div className="flex items-center gap-4 px-4 min-w-max mx-auto">
                                 <AnimatePresence mode="popLayout">
                                     {passengers.map((passenger, index) => (
                                         <motion.div
                                             key={passenger.id}
+                                            layout
                                             initial={{ opacity: 0, x: 100, scale: 0.8 }}
                                             animate={{
                                                 opacity: 1,
                                                 x: 0,
-                                                scale: animatingIndex === index ? 1.1 : 1,
-                                                boxShadow: animatingIndex === index ? '0 0 30px rgba(244, 92, 67, 0.6)' : 'none'
+                                                scale: animatingIndex === index ? 1.05 : 1,
+                                                zIndex: passengers.length - index
                                             }}
-                                            exit={{ opacity: 0, x: -100, scale: 0.8 }}
+                                            exit={{ opacity: 0, x: -100, scale: 0.8, filter: "blur(10px)" }}
                                             transition={{
-                                                duration: 0.5,
-                                                type: 'spring'
+                                                type: "spring",
+                                                stiffness: 400,
+                                                damping: 25
                                             }}
-                                            className="flex-shrink-0"
+                                            className="relative"
                                         >
-                                            <div className="glass-card p-4 w-52 h-full relative">
+                                            <div
+                                                className={`glass-card p-4 w-48 relative transition-all duration-300 ${animatingIndex === index
+                                                        ? 'border-orange-500 ring-2 ring-orange-500/30'
+                                                        : 'hover:border-orange-500/50'
+                                                    }`}
+                                                style={{
+                                                    background: animatingIndex === index
+                                                        ? 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(124, 45, 18, 0.8) 100%)'
+                                                        : undefined
+                                                }}
+                                            >
                                                 {index === 0 && (
-                                                    <div className="absolute -top-3 left-4 text-xs font-mono bg-red-500 px-2 py-1 rounded z-10">
-                                                        NEXT
+                                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 w-full text-center">
+                                                        <span className="text-[10px] font-bold font-mono bg-red-500 text-white px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">
+                                                            Boarding Now
+                                                        </span>
                                                     </div>
                                                 )}
 
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <span className="text-xs font-mono bg-red-500 bg-opacity-20 px-2 py-1 rounded">
-                                                        Position {index + 1}
-                                                    </span>
-                                                </div>
-
-                                                <div className="space-y-1">
-                                                    <div className="font-bold text-lg">{passenger.name}</div>
-                                                    <div className="text-xs text-secondary truncate">{passenger.email}</div>
-                                                    <div className="text-xs text-secondary">{passenger.phone}</div>
-                                                </div>
-
-                                                {/* Queue position indicator */}
-                                                <div className="mt-3 pt-3 border-t border-white border-opacity-10">
-                                                    <div className="text-xs text-secondary">
-                                                        {index === 0 ? 'Boarding now' : `Wait: ${index} ahead`}
+                                                <div className="flex items-center gap-3 mb-3 mt-1">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                                                        {index + 1}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-white text-sm truncate w-28">{passenger.name}</div>
+                                                        <div className="text-[10px] text-secondary font-mono">
+                                                            ID: {passenger.id.substring(0, 4)}
+                                                        </div>
                                                     </div>
                                                 </div>
+
+                                                <div className="pt-2 border-t border-white/10 flex justify-between items-center text-[10px]">
+                                                    <span className="text-secondary">Est. Wait</span>
+                                                    <span className="font-mono font-bold text-orange-300">{index * 2}m</span>
+                                                </div>
                                             </div>
+
+                                            {/* Connector */}
+                                            {index < passengers.length - 1 && (
+                                                <div className="absolute top-1/2 -right-6 w-4 h-[2px] bg-white/10"></div>
+                                            )}
                                         </motion.div>
                                     ))}
                                 </AnimatePresence>
                             </div>
                         )}
                     </div>
-
-                    {/* Flow indicator */}
-                    <div className="flex items-center gap-2 mt-4">
-                        <div className="text-xs text-secondary">Flow direction:</div>
-                        <motion.div
-                            animate={{ x: [-5, 5, -5] }}
-                            transition={{ repeat: Infinity, duration: 2 }}
-                            className="flex-1 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full"
-                        ></motion.div>
-                        <div className="text-xs text-secondary">→ Exit</div>
-                    </div>
                 </div>
 
-                {operation && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 p-4 bg-red-500 bg-opacity-10 border border-red-500 rounded-lg"
-                    >
-                        <p className="font-mono text-sm">{operation}</p>
-                    </motion.div>
-                )}
+                <AnimatePresence>
+                    {operation && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: 'auto' }}
+                            exit={{ opacity: 0, y: -10, height: 0 }}
+                            className="mt-4"
+                        >
+                            <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-xl flex items-center gap-3 shadow-lg backdrop-blur-sm">
+                                <div className="p-2 bg-orange-500/20 rounded-lg">
+                                    <MonitorPlay className="w-5 h-5 text-orange-500" />
+                                </div>
+                                <p className="font-mono text-sm text-orange-100">{operation}</p>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Right Panel */}
@@ -213,67 +244,82 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="glass-card p-6"
+                        className="glass-card p-6 border-l-4 border-l-orange-500"
                     >
-                        <h3 className="text-xl font-bold mb-4">📚 Queue Properties</h3>
-                        <div className="space-y-4 text-sm">
-                            <div>
-                                <h4 className="font-semibold text-red-400 mb-2">Time Complexity</h4>
-                                <ul className="space-y-1 text-secondary">
-                                    <li>• Enqueue: <span className="text-green-400 font-mono">O(1)</span></li>
-                                    <li>• Dequeue: <span className="text-green-400 font-mono">O(1)*</span></li>
-                                    <li>• Front: <span className="text-green-400 font-mono">O(1)</span></li>
-                                    <li className="text-xs">* With circular buffer implementation</li>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span className="text-2xl">📚</span> Properties
+                        </h3>
+                        <div className="space-y-5 text-sm">
+                            <div className="p-3 bg-white/5 rounded-lg">
+                                <h4 className="font-bold text-orange-500 mb-2 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-orange-500" /> Time Complexity
+                                </h4>
+                                <ul className="space-y-2 text-secondary ml-1">
+                                    <li className="flex justify-between">Enqueue <span className="text-green-400 font-mono font-bold bg-green-400/10 px-2 rounded">O(1)</span></li>
+                                    <li className="flex justify-between">Dequeue <span className="text-green-400 font-mono font-bold bg-green-400/10 px-2 rounded">O(1)</span></li>
+                                    <li className="flex justify-between">Front <span className="text-green-400 font-mono font-bold bg-green-400/10 px-2 rounded">O(1)</span></li>
+                                    <li className="flex justify-between">Search <span className="text-red-400 font-mono font-bold bg-red-400/10 px-2 rounded">O(n)</span></li>
                                 </ul>
                             </div>
 
                             <div>
-                                <h4 className="font-semibold text-red-400 mb-2">Space Complexity</h4>
-                                <p className="text-secondary">
-                                    <span className="text-red-400 font-mono">O(n)</span>
+                                <h4 className="font-bold text-orange-500 mb-2">Space Complexity</h4>
+                                <p className="text-secondary p-2 border border-white/10 rounded-lg bg-black/20">
+                                    <span className="text-orange-500 font-mono font-bold">O(n)</span> - Linear growth
                                 </p>
                             </div>
 
                             <div>
-                                <h4 className="font-semibold text-red-400 mb-2">Key Features</h4>
-                                <ul className="space-y-1 text-secondary">
-                                    <li>✓ FIFO (First In First Out)</li>
-                                    <li>✓ Fair ordering</li>
-                                    <li>✓ BFS traversal</li>
-                                    <li>✓ Task scheduling</li>
+                                <h4 className="font-bold text-orange-500 mb-2">Key Features</h4>
+                                <ul className="space-y-2 text-secondary">
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> FIFO (First In First Out)</li>
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> Fair resource scheduling</li>
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> Buffer management</li>
                                 </ul>
                             </div>
 
-                            <div className="code-block">
-                                <code>{`// Queue Operations\nqueue.enqueue(passenger) // O(1)\n\nconst next = queue.dequeue() // O(1)\n\nconst first = queue.front() // O(1)`}</code>
+                            <div className="code-block text-xs">
+                                <code>{`// Queue Operations
+queue.enqueue(x)   // O(1)
+const x = queue.dequeue() // O(1)
+const front = queue.peek() // O(1)`}</code>
                             </div>
                         </div>
                     </motion.div>
                 )}
 
-                <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold mb-4">Statistics</h3>
-                    <div className="space-y-3">
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Queue Size:</span>
-                            <span className="font-bold text-xl">{passengers.length}</span>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-card p-6 relative overflow-hidden group"
+                >
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-orange-500/20 rounded-full blur-xl group-hover:bg-orange-500/30 transition-colors" />
+
+                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
+                    <div className="space-y-4 relative z-10">
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+                            <span className="text-secondary">People in Line</span>
+                            <span className="font-bold text-2xl text-white">{passengers.length}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Front Passenger:</span>
-                            <span className="font-mono text-sm truncate max-w-[150px]">
-                                {passengers.length > 0 ? passengers[0].name : 'None'}
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+                            <span className="text-secondary">Next Boarding</span>
+                            <span className="font-mono text-sm text-orange-500 truncate max-w-[120px]">
+                                {passengers.length > 0 ? passengers[0].name.split(' ')[0] : '-'}
                             </span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Is Empty:</span>
-                            <span className="font-mono text-sm">{passengers.length === 0 ? 'true' : 'false'}</span>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
+                            <motion.div
+                                className="h-full bg-orange-500"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${Math.min((passengers.length / 10) * 100, 100)}%` }}
+                                transition={{ duration: 0.5 }}
+                            />
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Wait Time:</span>
-                            <span className="font-mono text-sm">{passengers.length * 2} min</span>
+                        <div className="text-xs text-center text-muted">
+                            Queue Capacity Usage
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

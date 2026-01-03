@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Search, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Search, MapPin, Network, GitGraph } from 'lucide-react';
 import { RouteTree, TreeNode, type Route } from '@/lib/dataStructures';
 import { airportCodes } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
     const [searchResult, setSearchResult] = useState<Route | null>(null);
     const [operation, setOperation] = useState<string>('');
     const [highlightPath, setHighlightPath] = useState<string[]>([]);
+    const [scale, setScale] = useState(1);
 
     useEffect(() => {
         if (demoMode) {
@@ -75,47 +76,64 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
         return (
             <div className="flex flex-col items-center">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
+                    initial={{ opacity: 0, scale: 0.5, y: -20 }}
                     animate={{
                         opacity: 1,
                         scale: isHighlighted ? 1.2 : 1,
-                        boxShadow: isHighlighted ? '0 0 30px rgba(118, 75, 162, 0.8)' : 'none'
+                        y: 0,
+                        zIndex: isHighlighted ? 10 : 0
                     }}
-                    transition={{ duration: 0.5, delay: level * 0.1 }}
-                    className="glass-card p-3 mb-4 relative"
-                    style={{
-                        minWidth: '120px',
-                        borderColor: isHighlighted ? '#764ba2' : undefined
-                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="relative z-10"
                 >
-                    <div className="text-center">
-                        <div className="font-bold text-lg text-purple-400">{node.data.code}</div>
-                        <div className="text-xs text-secondary truncate">{node.data.city}</div>
-                    </div>
-                    {level > 0 && (
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-xs font-mono bg-purple-500 bg-opacity-20 px-2 rounded">
-                            L{level}
+                    <div
+                        className={`glass-card p-3 mb-4 min-w-[100px] text-center transition-all duration-300 ${isHighlighted ? 'border-purple-400 ring-4 ring-purple-400/20 bg-purple-900/50' : 'hover:border-purple-400/50'
+                            }`}
+                    >
+                        {level > 0 && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                <span className="text-[10px] font-mono bg-purple-500 text-white px-1.5 py-0.5 rounded shadow-sm opacity-60">
+                                    L{level}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="font-bold text-lg text-purple-300 font-mono">{node.data.code}</div>
+                        <div className="text-[10px] text-secondary truncate max-w-[100px] mx-auto opacity-70">
+                            {node.data.city}
                         </div>
-                    )}
+                    </div>
                 </motion.div>
 
                 {(node.left || node.right) && (
-                    <div className="flex gap-8">
-                        <div className="flex flex-col items-center">
+                    <div className="flex gap-4 relative pt-4">
+                        {/* Connecting Lines */}
+                        <svg className="absolute top-0 left-0 w-full h-4 pointer-events-none overflow-visible">
                             {node.left && (
-                                <>
-                                    <div className="w-px h-8 bg-purple-500 opacity-50"></div>
-                                    {renderTree(node.left, level + 1, 'left')}
-                                </>
+                                <line
+                                    x1="50%" y1="0"
+                                    x2="25%" y2="100%"
+                                    stroke="#a855f7"
+                                    strokeWidth="2"
+                                    strokeOpacity="0.3"
+                                />
                             )}
+                            {node.right && (
+                                <line
+                                    x1="50%" y1="0"
+                                    x2="75%" y2="100%"
+                                    stroke="#a855f7"
+                                    strokeWidth="2"
+                                    strokeOpacity="0.3"
+                                />
+                            )}
+                        </svg>
+
+                        <div className="flex flex-col items-center">
+                            {node.left ? renderTree(node.left, level + 1, 'left') : <div className="w-16" />}
                         </div>
                         <div className="flex flex-col items-center">
-                            {node.right && (
-                                <>
-                                    <div className="w-px h-8 bg-purple-500 opacity-50"></div>
-                                    {renderTree(node.right, level + 1, 'right')}
-                                </>
-                            )}
+                            {node.right ? renderTree(node.right, level + 1, 'right') : <div className="w-16" />}
                         </div>
                     </div>
                 )}
@@ -125,27 +143,30 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 glass-card p-6">
-                <div className="flex items-center justify-between mb-6">
+            <div className="lg:col-span-2 panel relative overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between mb-8 z-10 relative">
                     <div>
-                        <h2 className="text-2xl font-bold mb-1">Binary Search Tree - Route Network</h2>
+                        <h2 className="text-2xl font-bold mb-1 text-shadow-sm flex items-center gap-2">
+                            <Network className="w-6 h-6 text-purple-400" />
+                            BST - Route Network
+                        </h2>
                         <p className="text-secondary text-sm">Hierarchical structure with O(log n) search</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => insertRoute()}
-                            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 rounded-lg font-semibold text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
                             Insert Route
                         </motion.button>
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={searchRoute}
-                            className="px-4 py-2 bg-white bg-opacity-10 rounded-lg font-semibold text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <Search className="w-4 h-4" />
                             Search
@@ -154,28 +175,52 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
                 </div>
 
                 {/* Tree Visualization */}
-                <div className="overflow-auto max-h-[600px] p-4">
-                    {!tree.root ? (
-                        <div className="text-center py-12 text-secondary">
-                            <MapPin className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                            <p>Tree is empty. Insert routes to begin.</p>
-                        </div>
-                    ) : (
-                        <div className="flex justify-center pt-4">
-                            {renderTree(tree.root)}
-                        </div>
-                    )}
+                <div className="flex-1 relative bg-black/20 rounded-2xl border border-white/5 overflow-hidden flex flex-col min-h-[500px]">
+                    <div className="absolute inset-0 grid-pattern opacity-30" />
+
+                    {/* Controls */}
+                    <div className="absolute top-4 right-4 z-20 flex gap-2">
+                        <button onClick={() => setScale(s => Math.min(s + 0.1, 1.5))} className="p-2 bg-white/10 rounded-lg hover:bg-white/20">+</button>
+                        <button onClick={() => setScale(s => Math.max(s - 0.1, 0.5))} className="p-2 bg-white/10 rounded-lg hover:bg-white/20">-</button>
+                    </div>
+
+                    <div className="flex-1 overflow-auto p-8 flex items-start justify-center">
+                        {!tree.root ? (
+                            <div className="text-center py-20 text-secondary flex flex-col items-center justify-center">
+                                <div className="w-24 h-24 bg-purple-500/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                                    <GitGraph className="w-12 h-12 text-purple-400 opacity-60" />
+                                </div>
+                                <p className="text-xl font-medium text-purple-200">Network is empty</p>
+                                <p className="text-sm opacity-60 mt-2">Insert routes to build the network</p>
+                            </div>
+                        ) : (
+                            <motion.div
+                                style={{ scale }}
+                                className="origin-top transition-transform duration-200"
+                            >
+                                {renderTree(tree.root)}
+                            </motion.div>
+                        )}
+                    </div>
                 </div>
 
-                {operation && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 p-4 bg-purple-500 bg-opacity-10 border border-purple-500 rounded-lg"
-                    >
-                        <p className="font-mono text-sm">{operation}</p>
-                    </motion.div>
-                )}
+                <AnimatePresence>
+                    {operation && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: 'auto' }}
+                            exit={{ opacity: 0, y: -10, height: 0 }}
+                            className="mt-4"
+                        >
+                            <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-center gap-3 shadow-lg backdrop-blur-sm">
+                                <div className="p-2 bg-purple-500/20 rounded-lg">
+                                    <Search className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <p className="font-mono text-sm text-purple-100">{operation}</p>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Right Panel */}
@@ -184,73 +229,90 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="glass-card p-6"
+                        className="glass-card p-6 border-l-4 border-l-purple-500"
                     >
-                        <h3 className="text-xl font-bold mb-4">📚 BST Properties</h3>
-                        <div className="space-y-4 text-sm">
-                            <div>
-                                <h4 className="font-semibold text-purple-400 mb-2">Time Complexity</h4>
-                                <ul className="space-y-1 text-secondary">
-                                    <li>• Search: <span className="text-yellow-400 font-mono">O(log n)</span></li>
-                                    <li>• Insert: <span className="text-yellow-400 font-mono">O(log n)</span></li>
-                                    <li>• Delete: <span className="text-yellow-400 font-mono">O(log n)</span></li>
-                                    <li className="text-xs">Average case for balanced tree</li>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span className="text-2xl">📚</span> BST Properties
+                        </h3>
+                        <div className="space-y-5 text-sm">
+                            <div className="p-3 bg-white/5 rounded-lg">
+                                <h4 className="font-bold text-purple-400 mb-2 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-purple-400" /> Time Complexity
+                                </h4>
+                                <ul className="space-y-2 text-secondary ml-1">
+                                    <li className="flex justify-between">Search <span className="text-yellow-400 font-mono font-bold bg-yellow-400/10 px-2 rounded">O(log n)</span></li>
+                                    <li className="flex justify-between">Insert <span className="text-yellow-400 font-mono font-bold bg-yellow-400/10 px-2 rounded">O(log n)</span></li>
+                                    <li className="flex justify-between">Delete <span className="text-yellow-400 font-mono font-bold bg-yellow-400/10 px-2 rounded">O(log n)</span></li>
                                 </ul>
                             </div>
 
                             <div>
-                                <h4 className="font-semibold text-purple-400 mb-2">Space Complexity</h4>
-                                <p className="text-secondary">
-                                    <span className="text-purple-400 font-mono">O(n)</span>
+                                <h4 className="font-bold text-purple-400 mb-2">Space Complexity</h4>
+                                <p className="text-secondary p-2 border border-white/10 rounded-lg bg-black/20">
+                                    <span className="text-purple-400 font-mono font-bold">O(n)</span> - Linear growth
                                 </p>
                             </div>
 
                             <div>
-                                <h4 className="font-semibold text-purple-400 mb-2">Key Features</h4>
-                                <ul className="space-y-1 text-secondary">
-                                    <li>✓ Ordered data</li>
-                                    <li>✓ Fast search/insert/delete</li>
-                                    <li>✓ In-order gives sorted</li>
-                                    <li>✓ Hierarchical relationships</li>
+                                <h4 className="font-bold text-purple-400 mb-2">Key Features</h4>
+                                <ul className="space-y-2 text-secondary">
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> Hierarchical Data</li>
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> Sorted In-order</li>
+                                    <li className="flex items-start gap-2"><span className="text-green-400">✓</span> Efficient Search</li>
                                 </ul>
                             </div>
 
-                            <div className="code-block">
-                                <code>{`// BST Insert\nif (val < node.val)\n  node.left = insert(val)\nelse\n  node.right = insert(val)\n\n// Search - O(log n)`}</code>
+                            <div className="code-block text-xs">
+                                <code>{`// BST Insert
+if (val < node.val)
+  node.left = insert(val)
+else
+  node.right = insert(val)
+
+// Search - O(log n)`}</code>
                             </div>
                         </div>
                     </motion.div>
                 )}
 
-                <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold mb-4">Statistics</h3>
-                    <div className="space-y-3">
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Total Nodes:</span>
-                            <span className="font-bold text-xl">{routes.length}</span>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-card p-6 relative overflow-hidden group"
+                >
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/20 rounded-full blur-xl group-hover:bg-purple-500/30 transition-colors" />
+
+                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
+                    <div className="space-y-4 relative z-10">
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+                            <span className="text-secondary">Total Nodes</span>
+                            <span className="font-bold text-2xl text-white">{routes.length}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-secondary">Height:</span>
-                            <span className="font-mono text-sm">~{Math.ceil(Math.log2(routes.length + 1))}</span>
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+                            <span className="text-secondary">Tree Height</span>
+                            <span className="font-mono text-sm text-purple-400">~{Math.ceil(Math.log2(routes.length + 1))}</span>
                         </div>
                         {searchResult && (
                             <div className="pt-3 border-t border-white border-opacity-10">
                                 <div className="text-xs text-secondary mb-1">Last Search Result:</div>
-                                <div className="font-bold">{searchResult.code}</div>
+                                <div className="font-bold text-purple-300">{searchResult.code}</div>
                                 <div className="text-xs text-secondary">{searchResult.name}</div>
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Routes List */}
                 <div className="glass-card p-6">
-                    <h3 className="text-lg font-bold mb-3">All Routes (In-Order)</h3>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                    <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-purple-400" />
+                        All Routes (In-Order)
+                    </h3>
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                         {routes.map((route) => (
-                            <div key={route.code} className="text-sm p-2 bg-white bg-opacity-5 rounded">
-                                <span className="font-mono text-purple-400">{route.code}</span>
-                                <span className="text-secondary ml-2">- {route.city}</span>
+                            <div key={route.code} className="text-sm p-2 bg-white/5 rounded hover:bg-white/10 transition-colors flex justify-between">
+                                <span className="font-mono text-purple-400 font-bold">{route.code}</span>
+                                <span className="text-secondary truncate ml-4">{route.city}</span>
                             </div>
                         ))}
                     </div>

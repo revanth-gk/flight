@@ -56,48 +56,70 @@ export default function Home() {
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 }
+    }
+  };
+
   return (
     <div className="min-h-screen grid-pattern">
       {/* Hero Section */}
-      <div className="container mx-auto px-6 py-16">
+      <div className="container mx-auto px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="flex items-center justify-center gap-4 mb-8">
             <motion.div
+              className="animate-float"
               animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
             >
-              <Plane className="w-16 h-16 text-purple-500" />
+              <div className="p-4 rounded-full bg-indigo-500/10 border border-indigo-500/30 backdrop-blur-md glow">
+                <Plane className="w-20 h-20 text-indigo-400 drop-shadow-lg" />
+              </div>
             </motion.div>
           </div>
-          <h1 className="text-6xl font-bold mb-4">
-            <span className="text-gradient">Flight Management System</span>
+          <h1 className="text-7xl font-extrabold mb-6 tracking-tight">
+            <span className="text-gradient drop-shadow-sm">Flight Management System</span>
           </h1>
-          <p className="text-2xl text-secondary mb-2">Visual Data Structures Laboratory</p>
-          <p className="text-lg text-muted max-w-3xl mx-auto">
+          <p className="text-2xl text-secondary mb-3 font-light tracking-wide">Visual Data Structures Laboratory</p>
+          <p className="text-lg text-muted max-w-3xl mx-auto leading-relaxed">
             An interactive platform demonstrating core data structures through real-world flight operations.
             Watch algorithms come to life with stunning visualizations and animations.
           </p>
 
-          <div className="flex gap-4 justify-center mt-8">
+          <div className="flex gap-6 justify-center mt-10">
             <Link href="/dashboard">
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(102, 126, 234, 0.6)" }}
                 whileTap={{ scale: 0.95 }}
-                className="btn-gradient text-lg px-8 py-4"
+                className="btn-gradient text-lg px-10 py-4 shadow-xl"
               >
                 Launch Dashboard
               </motion.button>
             </Link>
             <Link href="/demo">
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
                 whileTap={{ scale: 0.95 }}
-                className="glass-card px-8 py-4 text-lg font-semibold"
+                className="glass-card px-10 py-4 text-lg font-bold text-white shadow-lg border-white/20 hover:border-white/40"
               >
                 Watch Demo
               </motion.button>
@@ -106,95 +128,111 @@ export default function Home() {
         </motion.div>
 
         {/* Data Structures Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {dataStructures.map((ds, index) => (
             <Link
               key={ds.name}
               href={`/dashboard?structure=${ds.name.toLowerCase().replace(' ', '')}`}
             >
               <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-                whileTap={{ scale: 0.98 }}
-                className="glass-card p-6 cursor-pointer group h-full"
-                style={{
-                  transition: 'all 0.3s ease',
+                variants={itemVariants}
+                whileHover={{
+                  y: -12,
+                  scale: 1.03,
+                  transition: { duration: 0.3, type: "spring", stiffness: 300 }
                 }}
+                whileTap={{ scale: 0.98 }}
+                className="glass-card p-8 cursor-pointer group h-full relative overflow-hidden"
               >
-                <div className="flex items-start gap-4">
+                <div
+                  className="absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-20"
+                  style={{ background: ds.color }}
+                />
+
+                <div className="flex items-start gap-5 relative z-10">
                   <div
-                    className="p-3 rounded-xl group-hover:scale-110 transition-transform duration-300"
+                    className="p-4 rounded-2xl group-hover:rotate-6 transition-transform duration-500 shadow-lg ring-1 ring-white/10"
                     style={{
-                      background: `linear-gradient(135deg, ${ds.color}22 0%, ${ds.color}44 100%)`,
-                      border: `1px solid ${ds.color}`,
+                      background: `linear-gradient(135deg, ${ds.color}25 0%, ${ds.color}10 100%)`,
+                      border: `1px solid ${ds.color}66`,
+                      boxShadow: `0 8px 20px ${ds.color}33`
                     }}
                   >
-                    <ds.icon className="w-6 h-6" style={{ color: ds.color }} />
+                    <ds.icon className="w-8 h-8 drop-shadow-md" style={{ color: ds.color }} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-1 group-hover:text-purple-400 transition-colors">{ds.name}</h3>
-                    <p className="text-sm text-secondary mb-2">{ds.description}</p>
-                    <div className="complexity-badge" style={{ background: `${ds.color}22`, color: ds.color }}>
+                    <h3 className="text-2xl font-bold mb-2 group-hover:text-indigo-300 transition-colors">{ds.name}</h3>
+                    <p className="text-base text-secondary mb-3 font-medium">{ds.description}</p>
+                    <div className="complexity-badge shadow-sm" style={{
+                      background: `${ds.color}20`,
+                      color: ds.color,
+                      borderColor: `${ds.color}50`
+                    }}>
                       ⏱ {ds.complexity}
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-white border-opacity-10">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted group-hover:text-purple-400 transition-colors">Click to visualize</span>
-                    <motion.span
-                      className="text-purple-400 font-semibold"
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      →
-                    </motion.span>
-                  </div>
+                <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between text-sm">
+                  <span className="text-muted font-medium group-hover:text-white transition-colors">Click to visualize</span>
+                  <motion.div
+                    className="bg-white/10 p-2 rounded-full"
+                    animate={{ x: 0 }}
+                    whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.2)" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </motion.div>
                 </div>
               </motion.div>
             </Link>
           ))}
-        </div>
+        </motion.div>
 
         {/* Features Section */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="glass-card p-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="panel relative overflow-hidden"
         >
-          <h2 className="text-3xl font-bold mb-6 text-center">Platform Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-3">🎨</div>
-              <h3 className="font-bold text-lg mb-2">Beautiful Animations</h3>
-              <p className="text-sm text-secondary">
-                Every operation is visualized with smooth, professional animations
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"></div>
+          <h2 className="text-4xl font-bold mb-10 text-center text-shadow-sm">Why use this platform?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="text-center group p-4 rounded-2xl hover:bg-white/5 transition-colors duration-300">
+              <div className="text-5xl mb-5 transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">🎨</div>
+              <h3 className="font-bold text-xl mb-3 text-white">Beautiful Animations</h3>
+              <p className="text-secondary leading-relaxed px-4">
+                Every operation is visualized with smooth, professional animations that make algorithms intuitive
               </p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl mb-3">🧠</div>
-              <h3 className="font-bold text-lg mb-2">Learning Mode</h3>
-              <p className="text-sm text-secondary">
-                Step-by-step explanations with time & space complexity analysis
+            <div className="text-center group p-4 rounded-2xl hover:bg-white/5 transition-colors duration-300">
+              <div className="text-5xl mb-5 transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">🧠</div>
+              <h3 className="font-bold text-xl mb-3 text-white">Learning Mode</h3>
+              <p className="text-secondary leading-relaxed px-4">
+                Step-by-step explanations with detailed time & space complexity analysis for deep understanding
               </p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="font-bold text-lg mb-2">Real-time Operations</h3>
-              <p className="text-sm text-secondary">
-                Interact with live data structures and see immediate results
+            <div className="text-center group p-4 rounded-2xl hover:bg-white/5 transition-colors duration-300">
+              <div className="text-5xl mb-5 transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">⚡</div>
+              <h3 className="font-bold text-xl mb-3 text-white">Real-time Operations</h3>
+              <p className="text-secondary leading-relaxed px-4">
+                Interact with live data structures and see operations execute instantly with visual feedback
               </p>
             </div>
           </div>
         </motion.div>
 
         {/* Footer */}
-        <div className="text-center mt-16 text-muted">
-          <p>Built with Next.js, TypeScript, Framer Motion, and Supabase</p>
-          <p className="text-sm mt-2">Data Structures Laboratory Project © 2026</p>
+        <div className="text-center mt-20 pb-10 text-muted">
+          <p className="font-medium">Built with Next.js, TypeScript, Framer Motion, and Tailwind CSS</p>
+          <p className="text-sm mt-3 opacity-70">Data Structures Laboratory Project © 2026</p>
         </div>
       </div>
     </div>

@@ -52,116 +52,130 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen grid-pattern p-6">
-            <div className="max-w-[1800px] mx-auto">
+        <div className="min-h-screen grid-pattern p-4 sm:p-6 lg:p-8">
+            <div className="max-w-[1920px] mx-auto">
                 {/* Header */}
-                <div className="glass-card p-6 mb-6">
-                    <div className="flex flex-col gap-4">
-                        {/* Top Row: Back Button and Title */}
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <Link href="/">
-                                        <motion.button
-                                            whileHover={{ scale: 1.05, x: -2 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="flex items-center gap-2 px-3 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg font-semibold transition-all"
-                                        >
-                                            <ArrowLeft className="w-4 h-4" />
-                                            <span className="hidden sm:inline">Home</span>
-                                        </motion.button>
-                                    </Link>
-                                    <div>
-                                        <h1 className="text-3xl font-bold">Flight Management Dashboard</h1>
-                                    </div>
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="panel mb-8 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+                        <div className="w-64 h-64 bg-indigo-500 rounded-full blur-[100px]" />
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center relative z-10">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-4 mb-3">
+                                <Link href="/">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, x: -4 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="btn-gradient p-2.5 rounded-xl shadow-lg flex items-center justify-center group"
+                                    >
+                                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                                    </motion.button>
+                                </Link>
+                                <div>
+                                    <h1 className="text-3xl sm:text-4xl font-bold text-shadow-sm tracking-tight">
+                                        Flight Management <span className="text-gradient">Dashboard</span>
+                                    </h1>
                                 </div>
-                                <p className="text-secondary ml-0 sm:ml-20">Interactive Data Structures Visualization Platform</p>
                             </div>
+                            <p className="text-secondary text-lg ml-0 sm:ml-[4.5rem]">
+                                Interactive Data Structures Visualization Platform
+                            </p>
+                        </div>
 
-                            <div className="flex gap-3">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setLearningMode(!learningMode)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${learningMode
-                                        ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg shadow-purple-500/50'
-                                        : 'bg-white bg-opacity-10 hover:bg-opacity-20'
-                                        }`}
-                                >
-                                    <BookOpen className="w-5 h-5" />
-                                    <span className="hidden md:inline">Learning Mode</span>
-                                </motion.button>
+                        <div className="flex flex-wrap gap-4">
+                            <motion.button
+                                whileHover={{ scale: 1.02, translateY: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setLearningMode(!learningMode)}
+                                className={`flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all border ${learningMode
+                                    ? 'bg-purple-600/20 border-purple-500 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.3)]'
+                                    : 'bg-white/5 border-white/10 text-secondary hover:bg-white/10 hover:text-white'
+                                    }`}
+                            >
+                                <BookOpen className={`w-5 h-5 ${learningMode ? 'text-purple-400' : ''}`} />
+                                <span className="hidden sm:inline">Learning Mode</span>
+                                {learningMode && (
+                                    <span className="flex h-2 w-2 rounded-full bg-purple-400 animate-pulse ml-2" />
+                                )}
+                            </motion.button>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setDemoMode(!demoMode)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${demoMode
-                                        ? 'bg-gradient-to-r from-green-500 to-green-700 text-white shadow-lg shadow-green-500/50'
-                                        : 'bg-white bg-opacity-10 hover:bg-opacity-20'
-                                        }`}
-                                >
-                                    {demoMode ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                                    <span className="hidden md:inline">Demo Mode</span>
-                                </motion.button>
-                            </div>
+                            <motion.button
+                                whileHover={{ scale: 1.02, translateY: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setDemoMode(!demoMode)}
+                                className={`flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all border ${demoMode
+                                    ? 'bg-green-600/20 border-green-500 text-green-200 shadow-[0_0_20px_rgba(34,197,94,0.3)]'
+                                    : 'bg-white/5 border-white/10 text-secondary hover:bg-white/10 hover:text-white'
+                                    }`}
+                            >
+                                {demoMode ? <Pause className="w-5 h-5 text-green-400" /> : <Play className="w-5 h-5" />}
+                                <span className="hidden sm:inline">Demo Mode</span>
+                                {demoMode && (
+                                    <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse ml-2" />
+                                )}
+                            </motion.button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Data Structure Tabs */}
-                <div className="glass-card p-4 mb-6">
-                    <div className="flex gap-3 overflow-x-auto pb-2">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="glass-card p-2 mb-8 sticky top-4 z-50 backdrop-blur-2xl bg-black/40 border-white/10"
+                >
+                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar p-1">
                         {structures.map((structure) => (
                             <motion.button
                                 key={structure.id}
-                                whileHover={{ scale: 1.03, y: -2 }}
-                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setActiveStructure(structure.id)}
-                                className={`flex items-center gap-3 px-6 py-4 rounded-xl font-semibold whitespace-nowrap transition-all relative ${activeStructure === structure.id
-                                    ? 'bg-white bg-opacity-20 shadow-xl'
-                                    : 'bg-white bg-opacity-5 hover:bg-opacity-15'
+                                className={`flex items-center gap-3 px-5 py-3 rounded-lg font-bold whitespace-nowrap transition-all relative group flex-shrink-0 ${activeStructure === structure.id
+                                    ? 'text-white'
+                                    : 'text-gray-400 hover:text-gray-200'
                                     }`}
-                                style={{
-                                    border: activeStructure === structure.id
-                                        ? `2px solid ${structure.color}`
-                                        : '2px solid transparent',
-                                    boxShadow: activeStructure === structure.id
-                                        ? `0 0 20px ${structure.color}40, 0 4px 16px rgba(0,0,0,0.4)`
-                                        : 'none',
-                                }}
                             >
-                                <structure.icon
-                                    className="w-5 h-5 transition-all"
-                                    style={{
-                                        color: activeStructure === structure.id ? structure.color : '#94a3b8',
-                                        filter: activeStructure === structure.id ? 'drop-shadow(0 0 8px currentColor)' : 'none'
-                                    }}
-                                />
-                                <span className={activeStructure === structure.id ? 'text-white' : 'text-gray-300'}>
-                                    {structure.name}
-                                </span>
                                 {activeStructure === structure.id && (
                                     <motion.div
-                                        layoutId="activeTab"
-                                        className="absolute bottom-0 left-0 right-0 h-1 rounded-t-full"
-                                        style={{ backgroundColor: structure.color }}
+                                        layoutId="activeTabBackground"
+                                        className="absolute inset-0 rounded-lg"
+                                        style={{
+                                            background: `linear-gradient(135deg, ${structure.color}33 0%, ${structure.color}11 100%)`,
+                                            border: `1px solid ${structure.color}66`,
+                                            boxShadow: `0 0 20px ${structure.color}22`
+                                        }}
                                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                     />
                                 )}
+
+                                <span className="relative z-10 flex items-center gap-3">
+                                    <structure.icon
+                                        className={`w-5 h-5 transition-all duration-300 ${activeStructure === structure.id ? 'scale-110' : 'group-hover:scale-110'}`}
+                                        style={{
+                                            color: activeStructure === structure.id ? structure.color : undefined,
+                                            filter: activeStructure === structure.id ? `drop-shadow(0 0 8px ${structure.color})` : 'none'
+                                        }}
+                                    />
+                                    {structure.name}
+                                </span>
                             </motion.button>
                         ))}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Visualizer Area */}
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeStructure}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
                     >
                         {renderVisualizer()}
                     </motion.div>
