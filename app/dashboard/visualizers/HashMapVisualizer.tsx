@@ -111,10 +111,10 @@ export default function HashMapVisualizer({ learningMode, demoMode }: Props) {
                     </div>
                     <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(20, 184, 166, 0.5)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(20, 184, 166, 0.6)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={createBooking}
-                            className="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 border border-teal-400/50 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <Ticket className="w-4 h-4" />
                             Book Seat
@@ -123,7 +123,7 @@ export default function HashMapVisualizer({ learningMode, demoMode }: Props) {
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={searchBooking}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-white/5 border border-white/20 hover:border-teal-400/50 hover:bg-teal-500/20 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <Search className="w-4 h-4" />
                             Search
@@ -309,32 +309,52 @@ export default function HashMapVisualizer({ learningMode, demoMode }: Props) {
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-card p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-teal-500/20 rounded-full blur-xl group-hover:bg-teal-500/30 transition-colors" />
+                    <div className="absolute -right-4 -top-4 w-40 h-40 bg-teal-500/10 rounded-full blur-[50px] group-hover:bg-teal-500/20 transition-colors" />
 
-                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
-                    <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Total Bookings</span>
-                            <span className="font-bold text-2xl text-white">{bookings.length}</span>
+                    <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
+                        <span className="text-teal-400">📊</span> Live Statistics
+                    </h3>
+                    <div className="relative z-10 space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold text-secondary uppercase tracking-widest border-b border-white/10 pb-2">
+                            <div>Metric</div>
+                            <div className="text-right">Value</div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Load Factor</span>
-                            <div className="flex items-center gap-2">
-                                <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                    <motion.div
-                                        className="h-full bg-teal-400"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${Math.min((bookings.length / 8) * 100, 100)}%` }}
-                                    />
+
+                        <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-teal-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-teal-400 group-hover/row:shadow-[0_0_8px_rgba(45,212,191,1)] transition-shadow"></div>
+                                    Total Bookings
                                 </div>
-                                <span className="font-mono text-sm text-teal-400">{(bookings.length / 8).toFixed(2)}</span>
+                                <div className="text-right font-mono font-bold text-lg text-white text-shadow-sm">
+                                    {bookings.length}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-teal-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 group-hover/row:shadow-[0_0_8px_rgba(250,204,21,1)] transition-shadow"></div>
+                                    Collisions
+                                </div>
+                                <div className="text-right font-mono font-bold text-sm text-teal-300">
+                                    {buckets.filter(b => b.size > 1).length}
+                                </div>
                             </div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Collisions</span>
-                            <span className="font-mono text-sm text-yellow-400">
-                                {buckets.filter(b => b.size > 1).length}
-                            </span>
+
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                            <div className="flex justify-between text-xs mb-1">
+                                <span className="text-secondary">Load Factor</span>
+                                <span className="font-mono text-teal-400">{(bookings.length / 8).toFixed(2)}</span>
+                            </div>
+                            <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden border border-white/5">
+                                <motion.div
+                                    className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 origin-left"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min((bookings.length / 8) * 100, 100)}%` }}
+                                    transition={{ duration: 0.5, ease: "backOut" }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </motion.div>

@@ -129,7 +129,7 @@ export default function Home() {
 
         {/* Data Structures Grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 px-4"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -147,7 +147,7 @@ export default function Home() {
                   transition: { duration: 0.3, type: "spring", stiffness: 300 }
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="glass-card p-8 cursor-pointer group h-full relative overflow-hidden"
+                className="glass-card p-6 cursor-pointer group h-full relative overflow-hidden hover:border-white/30 transition-all duration-300"
               >
                 <div
                   className="absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-20"
@@ -166,8 +166,8 @@ export default function Home() {
                     <ds.icon className="w-8 h-8 drop-shadow-md" style={{ color: ds.color }} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 group-hover:text-indigo-300 transition-colors">{ds.name}</h3>
-                    <p className="text-base text-secondary mb-3 font-medium">{ds.description}</p>
+                    <h3 className="text-2xl font-extrabold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">{ds.name}</h3>
+                    <p className="text-sm text-secondary mb-3 font-medium leading-relaxed">{ds.description}</p>
                     <div className="complexity-badge shadow-sm" style={{
                       background: `${ds.color}20`,
                       color: ds.color,
@@ -229,11 +229,6 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Footer */}
-        <div className="text-center mt-20 pb-10 text-muted">
-          <p className="font-medium">Built with Next.js, TypeScript, Framer Motion, and Tailwind CSS</p>
-          <p className="text-sm mt-3 opacity-70">Data Structures Laboratory Project © 2026</p>
-        </div>
       </div>
     </div>
   );

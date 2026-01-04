@@ -154,10 +154,10 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
                     </div>
                     <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(168, 85, 247, 0.6)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => insertRoute()}
-                            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 border border-purple-400/50 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
                             Insert Route
@@ -166,7 +166,7 @@ export default function TreeVisualizer({ learningMode, demoMode }: Props) {
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={searchRoute}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-white/5 border border-white/20 hover:border-purple-400/50 hover:bg-purple-500/20 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <Search className="w-4 h-4" />
                             Search
@@ -280,23 +280,48 @@ else
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-card p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/20 rounded-full blur-xl group-hover:bg-purple-500/30 transition-colors" />
+                    <div className="absolute -right-4 -top-4 w-40 h-40 bg-purple-500/10 rounded-full blur-[50px] group-hover:bg-purple-500/20 transition-colors" />
 
-                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
-                    <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Total Nodes</span>
-                            <span className="font-bold text-2xl text-white">{routes.length}</span>
+                    <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
+                        <span className="text-purple-400">📊</span> Live Statistics
+                    </h3>
+                    <div className="relative z-10 space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold text-secondary uppercase tracking-widest border-b border-white/10 pb-2">
+                            <div>Metric</div>
+                            <div className="text-right">Value</div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Tree Height</span>
-                            <span className="font-mono text-sm text-purple-400">~{Math.ceil(Math.log2(routes.length + 1))}</span>
+
+                        <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-purple-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover/row:shadow-[0_0_8px_rgba(192,132,252,1)] transition-shadow"></div>
+                                    Total Nodes
+                                </div>
+                                <div className="text-right font-mono font-bold text-lg text-white text-shadow-sm">
+                                    {routes.length}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-purple-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 group-hover/row:shadow-[0_0_8px_rgba(129,140,248,1)] transition-shadow"></div>
+                                    Tree Height
+                                </div>
+                                <div className="text-right font-mono font-bold text-sm text-purple-300">
+                                    ~{Math.ceil(Math.log2(routes.length + 1))} <span className="text-[10px] text-secondary">levels</span>
+                                </div>
+                            </div>
                         </div>
+
                         {searchResult && (
-                            <div className="pt-3 border-t border-white border-opacity-10">
-                                <div className="text-xs text-secondary mb-1">Last Search Result:</div>
-                                <div className="font-bold text-purple-300">{searchResult.code}</div>
-                                <div className="text-xs text-secondary">{searchResult.name}</div>
+                            <div className="mt-4 pt-4 border-t border-white/10">
+                                <div className="text-xs text-secondary mb-2 uppercase tracking-wide">Last Search Result</div>
+                                <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-mono font-bold text-purple-300">{searchResult.code}</span>
+                                        <span className="text-xs text-white/70">{searchResult.name}</span>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

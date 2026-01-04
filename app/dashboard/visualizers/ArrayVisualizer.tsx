@@ -96,7 +96,7 @@ export default function ArrayVisualizer({ learningMode, demoMode }: Props) {
                             whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(99, 102, 241, 0.5)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={addFlight}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-xl font-bold text-white shadow-lg"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-800 border border-indigo-400/50 rounded-xl font-bold text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:shadow-[0_0_30px_rgba(99,102,241,0.8)] transition-all uppercase tracking-wide text-xs"
                         >
                             <Plus className="w-5 h-5" />
                             Add Flight
@@ -109,7 +109,7 @@ export default function ArrayVisualizer({ learningMode, demoMode }: Props) {
                                 setFlights([]);
                                 setOperation('Clear: Removed all flights');
                             }}
-                            className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white/80 hover:text-white transition-colors"
+                            className="p-2.5 bg-white/5 border border-white/20 hover:border-red-400/50 hover:bg-red-500/20 rounded-xl text-white/80 hover:text-red-200 transition-colors shadow-lg"
                         >
                             <RefreshCw className="w-5 h-5" />
                         </motion.button>
@@ -151,8 +151,8 @@ export default function ArrayVisualizer({ learningMode, demoMode }: Props) {
                                     >
                                         <motion.div
                                             className={`glass-card p-5 cursor-pointer relative group transition-all duration-300 ${selectedIndex === index
-                                                    ? 'border-indigo-400 ring-2 ring-indigo-400/30'
-                                                    : 'hover:border-indigo-400/50'
+                                                ? 'border-indigo-400 ring-2 ring-indigo-400/30'
+                                                : 'hover:border-indigo-400/50'
                                                 }`}
                                             onClick={() => accessFlight(index)}
                                             whileHover={{ y: -5 }}
@@ -171,7 +171,7 @@ export default function ArrayVisualizer({ learningMode, demoMode }: Props) {
                                             <div className="flex items-center justify-between mb-4 mt-1">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-2 h-2 rounded-full ${flight.status === 'scheduled' ? 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]' :
-                                                            flight.status === 'boarding' ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-blue-400'
+                                                        flight.status === 'boarding' ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-blue-400'
                                                         }`} />
                                                     <span className="text-xs font-mono opacity-70 tracking-wider">FLIGHT</span>
                                                 </div>
@@ -211,8 +211,8 @@ export default function ArrayVisualizer({ learningMode, demoMode }: Props) {
                                                 <div className="flex items-center justify-between text-xs pt-1">
                                                     <span className="text-secondary">{new Date(flight.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${flight.status === 'scheduled' ? 'bg-yellow-500/20 text-yellow-200 border border-yellow-500/30' :
-                                                            flight.status === 'boarding' ? 'bg-green-500/20 text-green-200 border border-green-500/30' :
-                                                                'bg-blue-500/20 text-blue-200 border border-blue-500/30'
+                                                        flight.status === 'boarding' ? 'bg-green-500/20 text-green-200 border border-green-500/30' :
+                                                            'bg-blue-500/20 text-blue-200 border border-blue-500/30'
                                                         }`}>
                                                         {flight.status}
                                                     </span>
@@ -311,32 +311,70 @@ array.splice(i, 1)     // O(n)`}</code>
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-card p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-xl group-hover:bg-indigo-500/30 transition-colors" />
+                    <div className="absolute -right-4 -top-4 w-40 h-40 bg-indigo-500/10 rounded-full blur-[50px] group-hover:bg-indigo-500/20 transition-colors" />
 
-                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
-                    <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Total Flights</span>
-                            <span className="font-bold text-2xl text-white">{flights.length}</span>
+                    <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
+                        <span className="text-indigo-400">📊</span> Live Statistics
+                    </h3>
+
+                    <div className="relative z-10 space-y-4">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold text-secondary uppercase tracking-widest border-b border-white/10 pb-2">
+                            <div>Metric</div>
+                            <div className="text-right">Value</div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Memory Usage</span>
-                            <span className="font-mono text-sm text-indigo-300">{flights.length * 64} bytes</span>
+
+                        {/* Table Rows */}
+                        <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-indigo-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 group-hover/row:shadow-[0_0_8px_rgba(129,140,248,1)] transition-shadow"></div>
+                                    Total Flights
+                                </div>
+                                <div className="text-right font-mono font-bold text-lg text-white text-shadow-sm">
+                                    {flights.length}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-indigo-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover/row:shadow-[0_0_8px_rgba(192,132,252,1)] transition-shadow"></div>
+                                    Est. Memory
+                                </div>
+                                <div className="text-right font-mono font-bold text-sm text-indigo-300">
+                                    {flights.length * 64} <span className="text-[10px] text-secondary">bytes</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-indigo-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 group-hover/row:shadow-[0_0_8px_rgba(74,222,128,1)] transition-shadow"></div>
+                                    Status
+                                </div>
+                                <div className="text-right font-mono font-bold text-xs text-green-300">
+                                    Active
+                                </div>
+                            </div>
                         </div>
-                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
-                            <motion.div
-                                className="h-full bg-indigo-500"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${Math.min((flights.length / 10) * 100, 100)}%` }}
-                                transition={{ duration: 0.5 }}
-                            />
-                        </div>
-                        <div className="text-xs text-center text-muted">
-                            {flights.length} / 10 recommended capacity
+
+                        {/* Visual Capacity Indicator */}
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                            <div className="flex justify-between text-xs mb-1">
+                                <span className="text-secondary">Capacity Usage</span>
+                                <span className="font-mono text-indigo-300">{Math.round((flights.length / 10) * 100)}%</span>
+                            </div>
+                            <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden border border-white/5">
+                                <motion.div
+                                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 origin-left"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min((flights.length / 10) * 100, 100)}%` }}
+                                    transition={{ duration: 0.5, ease: "backOut" }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </motion.div>
             </div>
-        </div>
+        </div >
     );
 }

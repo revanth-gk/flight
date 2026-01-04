@@ -91,19 +91,19 @@ export default function LinkedListVisualizer({ learningMode, demoMode }: Props) 
                     </div>
                     <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(74, 222, 128, 0.5)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(74, 222, 128, 0.6)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={addPassengerFirst}
-                            className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-700 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-700 border border-green-400/50 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <UserPlus className="w-4 h-4" />
                             Add First
                         </motion.button>
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(74, 222, 128, 0.5)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(22, 163, 74, 0.6)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={addPassenger}
-                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-800 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-800 border border-green-500/50 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <UserPlus className="w-4 h-4" />
                             Add Last
@@ -112,7 +112,7 @@ export default function LinkedListVisualizer({ learningMode, demoMode }: Props) 
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={removeFirst}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-white/5 border border-white/20 hover:border-red-400/50 hover:bg-red-500/20 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <UserMinus className="w-4 h-4" />
                             Pop
@@ -158,8 +158,8 @@ export default function LinkedListVisualizer({ learningMode, demoMode }: Props) 
                                             {/* Node */}
                                             <motion.div
                                                 className={`glass-card p-4 w-60 relative group transition-all duration-300 ${highlightedIndex === index
-                                                        ? 'border-green-400 ring-2 ring-green-400/30'
-                                                        : 'hover:border-green-400/50'
+                                                    ? 'border-green-400 ring-2 ring-green-400/30'
+                                                    : 'hover:border-green-400/50'
                                                     }`}
                                                 whileHover={{ y: -5 }}
                                                 style={{
@@ -307,21 +307,37 @@ head = node`}</code>
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-card p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-500/20 rounded-full blur-xl group-hover:bg-green-500/30 transition-colors" />
+                    <div className="absolute -right-4 -top-4 w-40 h-40 bg-green-500/10 rounded-full blur-[50px] group-hover:bg-green-500/20 transition-colors" />
 
-                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
-                    <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Total Passengers</span>
-                            <span className="font-bold text-2xl text-white">{passengers.length}</span>
+                    <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
+                        <span className="text-green-400">📊</span> Live Statistics
+                    </h3>
+                    <div className="relative z-10 space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold text-secondary uppercase tracking-widest border-b border-white/10 pb-2">
+                            <div>Metric</div>
+                            <div className="text-right">Value</div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Memory per Node</span>
-                            <span className="font-mono text-sm text-green-300">~48 bytes</span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Total Memory</span>
-                            <span className="font-mono text-sm text-green-300">{passengers.length * 48} bytes</span>
+
+                        <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-green-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 group-hover/row:shadow-[0_0_8px_rgba(74,222,128,1)] transition-shadow"></div>
+                                    Total Passengers
+                                </div>
+                                <div className="text-right font-mono font-bold text-lg text-white text-shadow-sm">
+                                    {passengers.length}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-green-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 group-hover/row:shadow-[0_0_8px_rgba(250,204,21,1)] transition-shadow"></div>
+                                    Total Memory
+                                </div>
+                                <div className="text-right font-mono font-bold text-sm text-green-300">
+                                    {passengers.length * 48} <span className="text-[10px] text-secondary">bytes</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </motion.div>

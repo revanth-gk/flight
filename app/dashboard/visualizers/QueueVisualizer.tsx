@@ -88,10 +88,10 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
                     </div>
                     <div className="flex gap-3">
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(249, 115, 22, 0.5)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(249, 115, 22, 0.6)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={enqueuePassenger}
-                            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 border border-orange-500/50 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2"
                         >
                             <UserPlus className="w-4 h-4" />
                             Enqueue
@@ -100,7 +100,7 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={dequeuePassenger}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-white/5 border border-white/20 hover:border-red-400/50 hover:bg-red-500/20 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             Dequeue
@@ -109,7 +109,7 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={viewFront}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-white/5 border border-white/20 hover:border-orange-400/50 hover:bg-orange-500/20 rounded-xl font-bold text-white shadow-lg text-sm flex items-center gap-2 transition-colors"
                         >
                             <MonitorPlay className="w-4 h-4" />
                             Front
@@ -172,8 +172,8 @@ export default function QueueVisualizer({ learningMode, demoMode }: Props) {
                                         >
                                             <div
                                                 className={`glass-card p-4 w-48 relative transition-all duration-300 ${animatingIndex === index
-                                                        ? 'border-orange-500 ring-2 ring-orange-500/30'
-                                                        : 'hover:border-orange-500/50'
+                                                    ? 'border-orange-500 ring-2 ring-orange-500/30'
+                                                    : 'hover:border-orange-500/50'
                                                     }`}
                                                 style={{
                                                     background: animatingIndex === index
@@ -293,30 +293,52 @@ const front = queue.peek() // O(1)`}</code>
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-card p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-orange-500/20 rounded-full blur-xl group-hover:bg-orange-500/30 transition-colors" />
+                    <div className="absolute -right-4 -top-4 w-40 h-40 bg-orange-500/10 rounded-full blur-[50px] group-hover:bg-orange-500/20 transition-colors" />
 
-                    <h3 className="text-xl font-bold mb-4 relative z-10">Statistics</h3>
-                    <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">People in Line</span>
-                            <span className="font-bold text-2xl text-white">{passengers.length}</span>
+                    <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
+                        <span className="text-orange-500">📊</span> Live Statistics
+                    </h3>
+                    <div className="relative z-10 space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold text-secondary uppercase tracking-widest border-b border-white/10 pb-2">
+                            <div>Metric</div>
+                            <div className="text-right">Value</div>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-                            <span className="text-secondary">Next Boarding</span>
-                            <span className="font-mono text-sm text-orange-500 truncate max-w-[120px]">
-                                {passengers.length > 0 ? passengers[0].name.split(' ')[0] : '-'}
-                            </span>
+
+                        <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-orange-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500 group-hover/row:shadow-[0_0_8px_rgba(249,115,22,1)] transition-shadow"></div>
+                                    People in Line
+                                </div>
+                                <div className="text-right font-mono font-bold text-lg text-white text-shadow-sm">
+                                    {passengers.length}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-lg border border-white/5 hover:border-orange-500/30 transition-colors group/row">
+                                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 group-hover/row:shadow-[0_0_8px_rgba(239,68,68,1)] transition-shadow"></div>
+                                    Next Boarding
+                                </div>
+                                <div className="text-right font-mono font-bold text-sm text-orange-300">
+                                    {passengers.length > 0 ? passengers[0].name.split(' ')[0] : '-'}
+                                </div>
+                            </div>
                         </div>
-                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
-                            <motion.div
-                                className="h-full bg-orange-500"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${Math.min((passengers.length / 10) * 100, 100)}%` }}
-                                transition={{ duration: 0.5 }}
-                            />
-                        </div>
-                        <div className="text-xs text-center text-muted">
-                            Queue Capacity Usage
+
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                            <div className="flex justify-between text-xs mb-1">
+                                <span className="text-secondary">Capacity Usage</span>
+                                <span className="font-mono text-orange-500">{Math.min(passengers.length * 10, 100)}%</span>
+                            </div>
+                            <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden border border-white/5">
+                                <motion.div
+                                    className="h-full bg-gradient-to-r from-orange-500 to-red-500 origin-left"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min((passengers.length / 10) * 100, 100)}%` }}
+                                    transition={{ duration: 0.5, ease: "backOut" }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </motion.div>
